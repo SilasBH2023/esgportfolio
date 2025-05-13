@@ -1,0 +1,32 @@
+pip install yfinance pandas numpy matplotlib seaborn statsmodels
+import yfinance as yf #Get stock/ESG date
+import numpy as np #tabular data
+import pandas as pd #numerical operations
+import seaborn as sns #good looking plots
+import matplotlib.pyplot as plt #plotting graphs
+import scipy.stats as stats #Z score and correlation
+import statsmodels.api as sm #Regressions, CAPM
+
+def get_user_inputs():
+    while True:
+        try:
+            min_score = int(input("Enter minimum ESG score (0 to 100): "))
+            if 0 <= min_score <= 100:
+                break
+            else:
+                print("Please enter a valid number between 0 and 100.")
+        except ValueError:
+            print("Please enter a numeric value.")
+    while True:
+        try:
+            portfolio_size = int(input("Enter number of securities in the portfolio: "))
+            if portfolio_size > 0:
+                break
+            else:
+                print("Please enter a number greater than 0.")
+        except ValueError:
+            print("Please enter a numeric value.")
+    return min_score, portfolio_size
+
+if __name__ == "__main__":
+    min_score, portfolio_size = get_user_inputs()
