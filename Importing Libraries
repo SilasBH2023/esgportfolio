@@ -10,11 +10,11 @@ import statsmodels.api as sm #Regressions, CAPM
 def get_user_inputs():
     while True:
         try:
-            min_score = int(input("Enter minimum ESG score (0 to 100): "))
-            if 0 <= min_score <= 100:
+            min_score = int(input("Enter minimum ESG score (0 to 10): "))
+            if 0 <= min_score <= 10:
                 break
             else:
-                print("Please enter a valid number between 0 and 100.")
+                print("Please enter a valid number between 0 and 10.")
         except ValueError:
             print("Please enter a numeric value.")
     while True:
@@ -30,3 +30,14 @@ def get_user_inputs():
 
 if __name__ == "__main__":
     min_score, portfolio_size = get_user_inputs()
+def get_user_inputs():
+    while True: 
+        try:
+            min_risk_score = int(input("On a scale of 1-5 enter your risk aversion (5 most and 1 least)"))
+                if 0 <= min_risk_score <= 10 
+                    break
+                else: 
+                    print("Please enter a number between 1 and 5.")
+            except ValueError: 
+                print("Please enter a numeric value.")
+        return min_risk_score
