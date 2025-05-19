@@ -1,0 +1,31 @@
+name: Run Stock Picker
+
+on:
+  workflow_dispatch:  # allows you to trigger it manually
+  schedule:
+    - cron: "0 12 * * 1-5"  # runs at 12:00 UTC Monday–Friday
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.10"
+
+    - name: Install dependencies
+      run: pip install -r requirements.txt
+
+    - name: Run script
+      run: python stock_picker.py
+
+    - name: Upload results
+      uses: actions/upload-artifact@v3
+      with:
+        name: stock-picks
+        path: stock_picks.csv
