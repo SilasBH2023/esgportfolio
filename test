@@ -1,1 +1,56 @@
+import yfinance as yf
+import pandas as pd
+import numpy as np
+from ta.momentum import RSIIndicator
+from ta.trend import MACD
 
+# === Configuration ===
+TICKERS = ["AAPL", "MSFT", "GOOGL", "AMZN", "TSLA", "NVDA", "META"]
+START_DATE = "2022-01-01"
+END_DATE = "2024-12-31"
+RISK_FREE_RATE = 0.05  # used in Sharpe ratio (annualized)
+
+# === Step 1: Download historical adjusted close data ===
+data = yf.download(TICKERS, start=START_DATE, end=END_DATE)["Adj Close"]
+
+# === Step 2: Calculate daily returns ===
+returns = data.pct_change().dropna()
+
+# === Step 3: Annualized mean return and volatility ===
+mean_returns = returns.mean() * 252
+volatility = returns.std() * np.sqrt(252)
+
+# === Step 4: Sharpe Ratio ===
+sharpe_ratio = (mean_returns - RISK_FREE_RATE) / volatility
+
+# === Step 5: Compute RSI and MACD ===
+def compute_indicators(price_series):
+    rsi = RSIIndicator(price_series).rsi()
+    macd = MACD(price_series).macd()
+    return rsi, macd
+
+indicators = {}
+for ticker in TICKERS:
+    rsi, macd = compute_indicators(data[ticker])
+    indicators[ticker] = {"RSI": rsi.iloc[-1], "MACD": macd.iloc[-1]}
+
+# === Step 6: Combine everything into a DataFrame ===
+summary = pd.DataFrame({
+    "Mean Return": mean_returns,
+    "Volatility": volatility,
+    "Sharpe Ratio": sharpe_ratio,
+    "RSI": [indicators[t]["RSI"] for t in TICKERS],
+    "MACD": [indicators[t]["MACD"] for t in TICKERS]
+})
+
+# === Step 7: Filter stocks ===
+# Criteria: Sharpe Ratio > 1.0 and RSI < 30 (oversold)
+filtered = summary[(summary["Sharpe Ratio"] > 1.0) & (summary["RSI"] < 30)]
+filtered = filtered.sort_values(by="Sharpe Ratio", ascending=False)
+
+# === Step 8: Output results ===
+print("=== Stock Picks Based on Sharpe Ratio & RSI < 30 ===")
+print(filtered)
+
+# Optional: save to CSV
+filtered.to_csv("stock_picks.csv")
