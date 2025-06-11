@@ -33,7 +33,7 @@ if __name__ == "__main__":
 def get_user_inputs():
     while True: 
         try:
-            min_risk_score = int(input("On a scale of 1-5 enter your risk aversion (5 most and 1 least)"))
+            min_risk_score = int(input("On a scale of 1-5 enter your risk aversion (5=very risk tolerant, 4=risk tolerant, 3=moderate, 2=risk adverse, 1=very risk adverse)"))
                 if 1 <= min_risk_score <= 5:
                     break
                 else: 
@@ -41,3 +41,15 @@ def get_user_inputs():
             except ValueError: 
                 print("Please enter a numeric value.")
         return min_risk_score
+#Translating risk aversion on the 1-5 scale into beta
+risk_aversion_map = {
+    1: 1.5,
+    2: 1.2,
+    3: 1.0,
+    4: 0.8,
+    5: 0.5
+}
+
+max_beta = risk_aversion_map[user_input_risk_aversion]
+# Filter stocks
+filtered_df = stock_df[stock_df['beta'] <= max_beta]
