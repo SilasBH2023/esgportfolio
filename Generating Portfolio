@@ -1,1 +1,7 @@
-
+#Generating porfolio minizmed by esg score and portfolio size and maximized by beta(volatility) 
+def generate_portolio(stock_df, min_score, max_beta, porfolio_size)
+  eligible = stock_df[
+    (stock_df['esg_score'] >= min_score) &
+    (stock_df['beta'] <= max_beta)
+]
+if
