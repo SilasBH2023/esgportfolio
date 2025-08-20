@@ -1,0 +1,50 @@
+import yfinance as yf
+import pandas as pd
+import numpy as np
+import datetime
+
+# --- SETTINGS ---
+tickers = ["AAPL", "MSFT", "GOOG"]   # your stock list
+market_index = "^GSPC"               # S&P 500 as market proxy
+rf = 0.04                            # risk-free rate
+expected_market_return = 0.08        # expected market return
+
+def calculate_beta(stock_returns, market_returns):
+    return np.cov(stock_returns, market_returns)[0,1] / np.var(market_returns)
+
+def get_close_returns(ticker, period="1y"):
+    df = yf.download(ticker, period=period)
+    # Handles both MultiIndex (when multiple tickers) and single index
+    if isinstance(df.columns, pd.MultiIndex):
+        close_prices = df["Close"][ticker]
+    else:
+        close_prices = df["Close"]
+    return close_prices.pct_change().dropna()
+
+def fetch_data():
+    data = []
+
+    # Market returns
+    market = get_close_returns(market_index)
+
+    for t in tickers:
+        stock = get_close_returns(t)
+        if len(stock) == 0 or len(market) == 0:
+            continue
+        beta = calculate_beta(stock, market)
+        expected_return = rf + beta * (expected_market_return - rf)
+
+        # Placeholder ESG (replace with API if you get ESG data)
+        esg_score = np.nan  
+
+        data.append([t, beta, esg_score, expected_return])
+
+    df = pd.DataFrame(data, columns=["Ticker", "Beta", "ESG", "ExpectedReturn"])
+    today = datetime.date.today().strftime("%Y-%m-%d")
+    df.to_csv(f"stocks_data_{today}.csv", index=False)
+
+    return df
+
+if __name__ == "__main__":
+    df = fetch_data()
+    print(df)
